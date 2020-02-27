@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}
+	{{ object.name }}
+{% endblock %}
+
+{% block main %}
+	<h1>
+  	{{ object }}
+	</h1>
+	<h3>
+    Brewered beers:
+	</h3>
+  <ul class="list-group list-group-horizontal">
+  	{% for beer in object.brewered.all %}
+    	<li class="list-group-item">
+        <a href="{% url 'beer:BeerDetail' pk=beer.id %}">{{ beer }}</a>
+    	</li>
+    {% empty %}
+    	<li class="list-group-item">Beers are unknown.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
