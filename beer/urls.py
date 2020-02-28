@@ -22,4 +22,7 @@ urlpatterns = [
     path('beer/<int:beer_id>/vote/<int:pk>',
         views.UpdateVote.as_view(),
         name='UpdateVote'),
+    path('beer/<int:beer_id>/image/upload',
+        views.BeerImageUpload.as_view(),
+        name='BeerImageUpload'),
 ]

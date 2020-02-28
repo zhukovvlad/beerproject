@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from beer.models import Beer, Brewery, Vote
-from beer.forms import VoteForm
+from beer.forms import VoteForm, BeerImageForm
 
 # Create your views here.
 class BeerList(ListView):
@@ -15,8 +15,14 @@ class BeerDetail(DetailView):
     # model = Beer
     queryset = Beer.objects.calculate_vote()
 
+    def beer_image_form(self):
+        if self.request.user.is_authenticated:
+            return BeerImageForm()
+        return None
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        ctx['image_form'] = self.beer_image_form()
         print(ctx)
         if self.request.user.is_authenticated:
             print(self.object)
@@ -50,6 +56,30 @@ class BreweryList(ListView):
 
 class BreweryDetail(DetailView):
     queryset = Brewery.objects.all_with_prefetch_beers()
+
+class BeerImageUpload(LoginRequiredMixin, CreateView):
+    form_class = BeerImageForm
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['user'] = self.request.user.id
+        initial['beer'] = self.kwargs['beer_id']
+        return initial
+    
+    def render_to_response(self, context, **response_kwargs):
+        beer_id = self.kwargs['beer_id']
+        beer_detail_url = reverse(
+            'beer:BeerDetail',
+            kwargs={'pk': beer_id})
+        return redirect(
+            to=beer_detail_url)
+    
+    def get_success_url(self):
+        beer_id = self.kwargs['beer_id']
+        beer_detail_url = reverse(
+            'beer:BeerDetail',
+            kwargs={'pk': beer_id})
+        return beer_detail_url
 
 class CreateVote(LoginRequiredMixin, CreateView):
     form_class = VoteForm
