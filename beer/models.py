@@ -1,7 +1,13 @@
+from uuid import uuid4
+
+from django.conf import settings
 from django.db import models
 from django.db.models.aggregates import Sum
 import django.contrib.auth
 from django.core.exceptions import ObjectDoesNotExist
+
+def beer_directory_path_with_uuid(instance, filename):
+    return '{}/{}'.format(instance.beer_id, uuid4())
 
 class BeerManager(models.Manager):
     def calculate_vote(self):
@@ -109,3 +115,13 @@ class Vote(models.Model):
     class Meta:
         unique_together = ('user', 'beer')
 
+class BeerImage(models.Model):
+    image = models.ImageField(
+        upload_to=beer_directory_path_with_uuid)
+    uploaded = models.DateTimeField(
+        auto_now_add=True)
+    beer = models.ForeignKey(
+        'Beer', on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        django.contrib.auth.get_user_model(),
+        on_delete = models.CASCADE)
