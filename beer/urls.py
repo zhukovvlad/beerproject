@@ -15,5 +15,11 @@ urlpatterns = [
         name='BreweryList'),
     path('brewery/<int:pk>',
         views.BreweryDetail.as_view(),
-        name='BreweryDetail')
+        name='BreweryDetail'),
+    path('beer/<int:beer_id>/vote',
+        views.CreateVote.as_view(),
+        name='CreateVote'),
+    path('beer/<int:beer_id>/vote/<int:pk>',
+        views.UpdateVote.as_view(),
+        name='UpdateVote'),
 ]

@@ -1,6 +1,13 @@
 from django.db import models
+from django.db.models.aggregates import Sum
 import django.contrib.auth
 from django.core.exceptions import ObjectDoesNotExist
+
+class BeerManager(models.Manager):
+    def calculate_vote(self):
+        qs = self.get_queryset()
+        qs = qs.annotate(score=Sum('vote__value'))
+        return qs
 
 class Beer(models.Model):
     title = models.CharField(max_length=140)
@@ -14,12 +21,13 @@ class Beer(models.Model):
     brewery = models.ForeignKey(to='Brewery', on_delete=models.SET_NULL, related_name='brewered', null=True, blank=True)
     style = models.ForeignKey(to='Style', on_delete=models.SET_NULL, null=True, blank=True)
 
+    objects = BeerManager()
+
     class Meta:
         ordering = ('title', )
 
     def __str__(self):
         return '{}'.format(self.title)
-
 
 class Style(models.Model):
     short_title = models.CharField(max_length=40, null=True, blank=True)
